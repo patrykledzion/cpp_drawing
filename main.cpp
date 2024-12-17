@@ -1,6 +1,7 @@
 ﻿#include <iostream> 
 #include "Program.h"
 
+
 int main()
 {
     Program* program = new Program();
@@ -8,7 +9,7 @@ int main()
     while (true)
     {
         program->Update();
-        program->Draw();
+        program->Draw();   
     }
 }
  

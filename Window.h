@@ -11,7 +11,7 @@ class Window
 private:
 	int width;
 	int height;
-	LPCWSTR title;
+	std::string title;
 	ATOM WINDOW_CLASS;
 	HWND windowPtr;
 	void _initWndClass();
@@ -20,13 +20,22 @@ private:
 	void _eventHandler();
 public:
 	using EventHandler = std::function<void(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)>;
-	Window(int width, int height, LPCWSTR title);
+	Window(int width, int height, std::string title);
+	~Window() = default;
 	void Update();
+	inline int GetWidth() { return this->width; }
+	inline int GetHeight() { return this->height; }
 
 	HWND GetWindow(); 
 	EventHandler lbClickHandle;
 	EventHandler rbClickHandle;
 	EventHandler contextMenuHandle;
+	EventHandler mouseMoveHandle;
+	EventHandler keyboardHandle;
+	EventHandler focusHandle;
+	EventHandler unfocusHandle;
+
+	Program* programInstance = nullptr;
 
 };
 

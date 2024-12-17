@@ -25,11 +25,37 @@ LRESULT Wndproc(
 	case WM_LBUTTONUP:
 	{ 
 		wnd->lbClickHandle(hWnd, uMsg, wParam, lParam);
+		break;
+	}
+
+	case WM_MOUSEMOVE: 
+	{
+		wnd->mouseMoveHandle(hWnd, uMsg, wParam, lParam);
+		break;
+	}
+	
+	case WM_KEYDOWN: 
+	{
+		wnd->keyboardHandle(hWnd, uMsg, wParam, lParam);
+		break;
 	}
 
 	case WM_COMMAND:
 	{
 		wnd->contextMenuHandle(hWnd, uMsg, wParam, lParam);
+		break;
+	}
+
+	case WM_KILLFOCUS:
+	{
+		wnd->unfocusHandle(hWnd, uMsg, wParam, lParam);
+		break;
+	}
+
+	case WM_SETFOCUS:
+	{
+		if (!wnd->programInstance)break;
+		wnd->focusHandle(hWnd, uMsg, wParam, lParam);
 		break;
 	}
 
@@ -52,28 +78,30 @@ void Window::_initWndClass()
 	wndClass.hCursor= NULL;
 	wndClass.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
 	wndClass.lpszMenuName = NULL;
-	wndClass.lpszClassName = L"WINDOW CLASS NAME";
+	wndClass.lpszClassName = L"Okno";
 
 	this->WINDOW_CLASS = (ATOM)RegisterClass(&wndClass);
 }
 
 void Window::_initWindow()
 {
+	
+ 
+
 	if (Window::WINDOW_CLASS == NULL)return;
-	HWND hwnd = CreateWindowExW(
+	HWND hwnd = CreateWindowEx(
 		0,
-		(LPCWSTR)this->WINDOW_CLASS,
-		this->title,
+		(LPCWSTR)Window::WINDOW_CLASS,
+		L"",
 		WS_TILEDWINDOW,
 		100, 100, //POS
 		this->width, this->height,
 		NULL, NULL, NULL, NULL
 	);
 
-	if (hwnd == NULL)return;
+	if (hwnd == NULL)return; 
 	this->windowPtr = hwnd;
 	SetWindowLongPtrW(this->windowPtr, GWLP_USERDATA, (LONG_PTR)this);
-	
 	ShowWindow(hwnd, SW_NORMAL);
 }
 
@@ -95,6 +123,11 @@ void Window::_initGL()
 	HGLRC hglrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, hglrc);
 
+	RECT rcCli;
+	GetClientRect(WindowFromDC(hdc), &rcCli);
+	this->width = rcCli.right;
+	this->height = rcCli.bottom;
+
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
 
 }
@@ -109,7 +142,7 @@ void Window::_eventHandler()
 	}
 }
 
-Window::Window(int width, int height, LPCWSTR title) : width(width), height(height), title(title)
+Window::Window(int width, int height, std::string title) : width(width), height(height), title(title)
 {
 	this->WINDOW_CLASS = (ATOM)NULL;
 	this->_initWndClass();
